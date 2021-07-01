@@ -108,9 +108,6 @@ Object {
       "passwordUseCount": 0,
     },
     "scenes": Object {
-      "controlPanel": Object {
-        "usersView": false,
-      },
       "createWallet": Object {
         "handleActivationInfo": Object {
           "activationCost": "",
