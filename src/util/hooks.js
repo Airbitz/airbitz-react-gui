@@ -3,9 +3,7 @@
 import * as React from 'react'
 import * as ReactRedux from 'react-redux'
 
-import { type Dispatch, type RootState } from '../types/reduxTypes.js'
-
-// react hooks --------------------------------------------------------
+import { type Dispatch, type RootState, type ShallowEqual } from '../types/reduxTypes'
 
 type SetState<S> = (value: S | ((state: S) => S)) => void
 
@@ -20,6 +18,10 @@ type UseEffect = (effect: () => void | (() => void), deps?: any[]) => void
 type UseImperativeHandle = (ref: any, init: () => any, deps?: any[]) => void
 
 type UseMemo = <T>(init: () => T, deps?: any[]) => T
+
+type UseDispatch = () => Dispatch
+
+type UseSelector = ((state: RootState) => any, shallowEqual?: ShallowEqual) => any
 
 type UseReducer = {
   // Normal version:
@@ -65,10 +67,6 @@ export const useRef: UseRef = React.useRef
 export const useState: UseState = React.useState
 
 // react-redux hooks --------------------------------------------------
-
-type UseDispatch = () => Dispatch
-
-type UseSelector = <T>((state: RootState) => T) => T
 
 // $FlowFixMe
 export const useDispatch: UseDispatch = ReactRedux.useDispatch
