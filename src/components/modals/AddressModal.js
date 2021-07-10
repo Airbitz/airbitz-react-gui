@@ -373,23 +373,6 @@ class AddressModalConnected extends React.Component<Props, State> {
   }
 }
 
-const AddressModal = connect(
-  (state: RootState, ownProps: OwnProps): StateProps => {
-    const { account } = state.core
-    const { currencyWallets } = account
-    return {
-      account,
-      coreWallet: currencyWallets[ownProps.walletId],
-      userFioAddresses: state.ui.scenes.fioAddress.fioAddresses,
-      userFioAddressesLoading: state.ui.scenes.fioAddress.fioAddressesLoading,
-      fioPlugin: account.currencyConfig[CURRENCY_PLUGIN_NAMES.FIO],
-      fioWallets: state.ui.wallets.fioWallets
-    }
-  },
-  (dispatch: Dispatch): DispatchProps => ({ refreshAllFioAddresses: () => dispatch(refreshAllFioAddresses()) })
-)(withTheme(AddressModalConnected))
-export { AddressModal }
-
 const getStyles = cacheStyles((theme: Theme) => ({
   container: {
     flex: 1,
@@ -418,3 +401,19 @@ const getStyles = cacheStyles((theme: Theme) => ({
     alignItems: 'center'
   }
 }))
+
+export const AddressModal = connect(
+  (state: RootState, ownProps: OwnProps): StateProps => ({
+    account: state.core.account,
+    coreWallet: state.core.account.currencyWallets[ownProps.walletId],
+    userFioAddresses: state.ui.scenes.fioAddress.fioAddresses,
+    userFioAddressesLoading: state.ui.scenes.fioAddress.fioAddressesLoading,
+    fioPlugin: state.core.account.currencyConfig[CURRENCY_PLUGIN_NAMES.FIO],
+    fioWallets: state.ui.wallets.fioWallets
+  }),
+  (dispatch: Dispatch): DispatchProps => ({
+    async refreshAllFioAddresses() {
+      await dispatch(refreshAllFioAddresses())
+    }
+  })
+)(withTheme(AddressModalConnected))

@@ -18,12 +18,12 @@ import { cacheStyles } from '../services/ThemeContext.js'
 import { SceneHeader } from '../themed/SceneHeader'
 import { Tile } from '../themed/Tile'
 
-export type StateProps = {
+type StateProps = {
   fioPlugin?: EdgeCurrencyConfig,
   isConnected: boolean
 }
 
-export type NavigationProps = {
+type NavigationProps = {
   fioName: string,
   paymentWallet: EdgeCurrencyWallet,
   fee: number,
@@ -170,10 +170,10 @@ const getStyles = cacheStyles(() => ({
   }
 }))
 
-const FioNameConfirmScene = connect((state: RootState) => {
-  return {
+export const FioNameConfirmScene = connect(
+  (state: RootState): StateProps => ({
     fioPlugin: state.core.account.currencyConfig[CURRENCY_PLUGIN_NAMES.FIO],
     isConnected: state.network.isConnected
-  }
-}, {})(FioNameConfirm)
-export { FioNameConfirmScene }
+  }),
+  null
+)(FioNameConfirm)

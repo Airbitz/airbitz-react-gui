@@ -32,9 +32,9 @@ type StateProps = {
   username: string
 }
 type DispatchProps = {
-  deepLinkHandled(): void,
-  initializeAccount(account: EdgeAccount, touchIdInfo: GuiTouchIdInfo): void,
-  logout(): void
+  deepLinkHandled: () => void,
+  initializeAccount: (account: EdgeAccount, touchIdInfo: GuiTouchIdInfo) => void,
+  logout: () => void
 }
 type Props = StateProps & DispatchProps
 

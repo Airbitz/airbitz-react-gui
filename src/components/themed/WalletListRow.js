@@ -1,4 +1,5 @@
 // @flow
+
 import type { EdgeCurrencyInfo } from 'edge-core-js'
 import * as React from 'react'
 import { ActivityIndicator, TouchableOpacity, View } from 'react-native'

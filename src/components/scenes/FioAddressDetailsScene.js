@@ -21,17 +21,17 @@ import { EdgeText } from '../themed/EdgeText.js'
 import { SettingsHeaderRow } from '../themed/SettingsHeaderRow'
 import { SettingsRow } from '../themed/SettingsRow.js'
 
-export type StateProps = {
+type StateProps = {
   fioWallets: EdgeCurrencyWallet[]
 }
 
-export type NavProps = {
+type NavProps = {
   fioAddressName: string,
   expiration: string,
   navigation: any
 }
 
-export type LocalState = {
+type LocalState = {
   fioWalletLoading: boolean,
   fioWallet: EdgeCurrencyWallet | null
 }

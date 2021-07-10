@@ -258,14 +258,14 @@ const getStyles = cacheStyles((theme: Theme) => ({
   }
 }))
 
-const AddressTileConnector = connect((state: RootState): StateProps => {
-  const { guiMakeSpendInfo } = state.ui.scenes.sendConfirmation
-  return {
-    fioToAddress: guiMakeSpendInfo && guiMakeSpendInfo.fioAddress ? guiMakeSpendInfo.fioAddress : undefined,
+const AddressTileConnector = connect(
+  (state: RootState): StateProps => ({
+    fioToAddress: state.ui.scenes.sendConfirmation.guiMakeSpendInfo?.fioAddress,
     fioPlugin: state.core.account.currencyConfig[CURRENCY_PLUGIN_NAMES.FIO],
     fioWallets: state.ui.wallets.fioWallets
-  }
-})(withTheme(AddressTileComponent))
+  }),
+  null
+)(withTheme(AddressTileComponent))
 
 // $FlowFixMe - forwardRef is not recognize by flow?
 export const AddressTile = React.forwardRef((props, ref) => <AddressTileConnector {...props} addressTileRef={ref} />) // eslint-disable-line

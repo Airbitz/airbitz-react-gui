@@ -142,7 +142,10 @@ const getStyles = cacheStyles((theme: Theme) => ({
   }
 }))
 
-export const WalletListFooter = connect((state: RootState): StateProps => ({
-  account: state.core.account,
-  wallets: state.ui.wallets.byId
-}))(withTheme(WalletListFooterComponent))
+export const WalletListFooter = connect(
+  (state: RootState): StateProps => ({
+    account: state.core.account,
+    wallets: state.ui.wallets.byId
+  }),
+  null
+)(withTheme(WalletListFooterComponent))

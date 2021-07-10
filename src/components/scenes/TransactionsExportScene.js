@@ -276,9 +276,9 @@ class TransactionsExportSceneComponent extends React.PureComponent<Props, State>
   }
 }
 
-export const TransactionsExportScene = connect((state: RootState, ownProps: OwnProps): StateProps => {
-  const denominationObject = getDisplayDenomination(state, ownProps.currencyCode)
-  return {
-    multiplier: denominationObject.multiplier
-  }
-})(withTheme(TransactionsExportSceneComponent))
+export const TransactionsExportScene = connect(
+  (state: RootState, ownProps: OwnProps): StateProps => ({
+    multiplier: getDisplayDenomination(state, ownProps.currencyCode).multiplier
+  }),
+  null
+)(withTheme(TransactionsExportSceneComponent))

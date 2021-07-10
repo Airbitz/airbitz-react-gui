@@ -20,15 +20,13 @@ type NavigationProps = {
   selectedFioSentRequest: FioRequest
 }
 
-type FioSentRequestDetailsProps = {
+type StateProps = {
   fiatSymbol: string,
   isoFiatCurrencyCode: string,
   exchangeRates: GuiExchangeRates
 }
 
-type FioSentRequestDetailsDispatchProps = {}
-
-type Props = FioSentRequestDetailsProps & FioSentRequestDetailsDispatchProps & NavigationProps & ThemeProps
+type Props = StateProps & NavigationProps & ThemeProps
 
 class FioSentRequestDetailsComponent extends React.PureComponent<Props> {
   fiatAmount = (currencyCode: string, amount: string) => {
@@ -96,17 +94,11 @@ const getStyles = cacheStyles((theme: Theme) => ({
   }
 }))
 
-const FioSentRequestDetailsScene = connect((state: RootState) => {
+export const FioSentRequestDetailsScene = connect((state: RootState): StateProps => {
   const wallet: GuiWallet = getSelectedWallet(state)
-  const isoFiatCurrencyCode = wallet.isoFiatCurrencyCode
-  const exchangeRates = state.exchangeRates
-  const fiatSymbol = FIAT_CODES_SYMBOLS[wallet.fiatCurrencyCode]
-
-  const out: FioSentRequestDetailsProps = {
-    exchangeRates,
-    fiatSymbol,
-    isoFiatCurrencyCode
+  return {
+    exchangeRates: state.exchangeRates,
+    fiatSymbol: FIAT_CODES_SYMBOLS[wallet.fiatCurrencyCode],
+    isoFiatCurrencyCode: wallet.isoFiatCurrencyCode
   }
-  return out
-}, {})(withTheme(FioSentRequestDetailsComponent))
-export { FioSentRequestDetailsScene }
+}, null)(withTheme(FioSentRequestDetailsComponent))

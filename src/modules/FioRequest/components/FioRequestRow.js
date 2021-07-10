@@ -162,17 +162,17 @@ const getStyles = cacheStyles((theme: Theme) => ({
   }
 }))
 
-const mapStateToProps = (state: RootState, ownProps: OwnProps) => {
+export const FioRequestRowConnector = connect((state: RootState, ownProps: OwnProps): StateProps => {
   const { fioRequest } = ownProps
+  let displayDenomination = emptyDisplayDenomination
   const wallet: GuiWallet = getSelectedWallet(state)
   if (!wallet) {
     return {
-      displayDenomination: {},
+      displayDenomination,
       fiatSymbol: '',
       fiatAmount: ''
     }
   }
-  let displayDenomination = emptyDisplayDenomination
   const tokenCode = fioRequest.content.token_code.toUpperCase()
   try {
     displayDenomination = getDisplayDenomination(state, tokenCode)
@@ -194,6 +194,4 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps) => {
     fiatAmount
   }
   return out
-}
-
-export const FioRequestRowConnector = connect(mapStateToProps, {})(withTheme(FioRequestRow))
+}, null)(withTheme(FioRequestRow))

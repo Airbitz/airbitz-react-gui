@@ -9,9 +9,10 @@ import type { RootState } from '../../reducers/RootReducer'
 import { type Theme, type ThemeProps, cacheStyles, withTheme } from '../services/ThemeContext.js'
 import { EdgeText } from './EdgeText'
 
-export type Props = {
+type StateProps = {
   message: string
 }
+type Props = StateProps
 
 export class CryptoExchangeMessageBoxComponent extends React.PureComponent<Props & ThemeProps> {
   render() {
@@ -45,7 +46,7 @@ const getStyles = cacheStyles((theme: Theme) => ({
   }
 }))
 
-const mapStateToProps = (state: RootState): Props => {
+export const CryptoExchangeMessageBox = connect((state: RootState): StateProps => {
   const insufficient = state.cryptoExchange.insufficientError
   const genericError = state.cryptoExchange.genericShapeShiftError
 
@@ -60,6 +61,4 @@ const mapStateToProps = (state: RootState): Props => {
   return {
     message
   }
-}
-
-export const CryptoExchangeMessageBox = connect(mapStateToProps, null)(withTheme(CryptoExchangeMessageBoxComponent))
+}, null)(withTheme(CryptoExchangeMessageBoxComponent))

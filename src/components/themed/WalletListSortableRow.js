@@ -160,9 +160,12 @@ const getStyles = cacheStyles((theme: Theme) => ({
   }
 }))
 
-export const WalletListSortableRow = connect((state: RootState, ownProps: OwnProps): StateProps => ({
-  showBalance: state.ui.settings.isAccountBalanceVisible,
-  settings: state.ui.settings,
-  exchangeRates: state.exchangeRates,
-  walletFiatSymbol: ownProps.guiWallet ? getFiatSymbol(ownProps.guiWallet.isoFiatCurrencyCode) : null
-}))(withTheme(WalletListSortableRowComponent))
+export const WalletListSortableRow = connect(
+  (state: RootState, ownProps: OwnProps): StateProps => ({
+    showBalance: state.ui.settings.isAccountBalanceVisible,
+    settings: state.ui.settings,
+    exchangeRates: state.exchangeRates,
+    walletFiatSymbol: ownProps.guiWallet ? getFiatSymbol(ownProps.guiWallet.isoFiatCurrencyCode) : null
+  }),
+  null
+)(withTheme(WalletListSortableRowComponent))

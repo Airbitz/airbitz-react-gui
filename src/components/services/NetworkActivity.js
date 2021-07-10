@@ -8,9 +8,10 @@ import s from '../../locales/strings'
 import { type Dispatch } from '../../types/reduxTypes.js'
 import { showError } from './AirshipInstance'
 
-type Props = {
+type DispatchProps = {
   changeConnectivity: (isConnected: boolean) => void
 }
+type Props = DispatchProps
 
 class NetworkActivityComponent extends React.Component<Props> {
   netInfoUnsubscribe: void | (() => void)
@@ -39,9 +40,9 @@ class NetworkActivityComponent extends React.Component<Props> {
 
 export const NetworkActivity = connect(
   () => ({}),
-  (dispatch: Dispatch) => ({
-    changeConnectivity: (isConnected: boolean) => {
-      return dispatch({
+  (dispatch: Dispatch): DispatchProps => ({
+    changeConnectivity(isConnected: boolean) {
+      dispatch({
         type: 'NETWORK/NETWORK_STATUS',
         data: { isConnected }
       })

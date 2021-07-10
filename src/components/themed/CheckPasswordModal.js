@@ -25,12 +25,12 @@ type StateProps = {
   account: EdgeAccount
 }
 
+type Props = OwnProps & StateProps & ThemeProps
+
 type State = {
   input: string,
   error: string
 }
-
-type Props = OwnProps & StateProps & ThemeProps
 
 class CheckPasswordModalComponent extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -85,10 +85,6 @@ class CheckPasswordModalComponent extends React.Component<Props, State> {
   }
 }
 
-export const CheckPasswordModal = connect((state: RootState): StateProps => ({
-  account: state.core.account
-}))(withTheme(CheckPasswordModalComponent))
-
 const getStyles = cacheStyles((theme: Theme) => ({
   container: {
     justifyContent: 'center',
@@ -111,3 +107,10 @@ const getStyles = cacheStyles((theme: Theme) => ({
     marginBottom: theme.rem(1.5)
   }
 }))
+
+export const CheckPasswordModal = connect(
+  (state: RootState): StateProps => ({
+    account: state.core.account
+  }),
+  null
+)(withTheme(CheckPasswordModalComponent))

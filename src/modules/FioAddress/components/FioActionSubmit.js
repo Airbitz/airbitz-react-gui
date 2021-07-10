@@ -36,7 +36,7 @@ type OwnProps = {
   showPaymentWalletPicker?: boolean
 }
 
-export type State = {
+type State = {
   showSlider: boolean,
   loading: boolean,
   error: string,
@@ -47,7 +47,7 @@ export type State = {
   paymentWallet?: EdgeCurrencyWallet
 }
 
-export type StateProps = {
+type StateProps = {
   denominationMultiplier: string,
   currencyWallets: { [string]: EdgeCurrencyWallet },
   fioWallets: EdgeCurrencyWallet[]
@@ -262,11 +262,11 @@ const getStyles = cacheStyles((theme: Theme) => ({
   }
 }))
 
-export const FioActionSubmit = connect((state: RootState): StateProps => {
-  const displayDenomination = getDisplayDenomination(state, FIO_STR)
-  return {
-    denominationMultiplier: displayDenomination.multiplier,
+export const FioActionSubmit = connect(
+  (state: RootState): StateProps => ({
+    denominationMultiplier: getDisplayDenomination(state, FIO_STR).multiplier,
     currencyWallets: state.core.account.currencyWallets,
     fioWallets: state.ui.wallets.fioWallets
-  }
-})(withTheme(FioActionSubmitComponent))
+  }),
+  null
+)(withTheme(FioActionSubmitComponent))

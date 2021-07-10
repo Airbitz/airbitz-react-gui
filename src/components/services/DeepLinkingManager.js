@@ -23,8 +23,8 @@ type StateProps = {
 }
 
 type DispatchProps = {
-  launchDeepLink(link: DeepLink): void,
-  retryPendingDeepLink(): void
+  launchDeepLink: (link: DeepLink) => void,
+  retryPendingDeepLink: () => void
 }
 
 type Props = StateProps & DispatchProps

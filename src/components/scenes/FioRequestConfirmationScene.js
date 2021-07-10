@@ -307,7 +307,7 @@ const getStyles = cacheStyles((theme: Theme) => ({
   }
 }))
 
-const FioRequestConfirmationScene = connect((state: RootState): StateProps => {
+export const FioRequestConfirmationScene = connect((state: RootState): StateProps => {
   const guiWallet: GuiWallet = getSelectedWallet(state)
   const { account } = state.core
   const currencyCode: string = state.ui.wallets.selectedCurrencyCode
@@ -366,4 +366,3 @@ const FioRequestConfirmationScene = connect((state: RootState): StateProps => {
     fioPlugin: account.currencyConfig[CURRENCY_PLUGIN_NAMES.FIO]
   }
 })(withTheme(FioRequestConfirmationConnected))
-export { FioRequestConfirmationScene }

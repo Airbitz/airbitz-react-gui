@@ -31,7 +31,7 @@ type State = {
 
 type Props = StateProps & ThemeProps
 
-export class NotificationComponent extends React.Component<Props, State> {
+class NotificationComponent extends React.Component<Props, State> {
   mounted: boolean
 
   constructor(props: Props) {
@@ -128,9 +128,10 @@ const getStyles = cacheStyles((theme: Theme) => ({
   }
 }))
 
-export const NotificationScene = connect((state: RootState): StateProps => {
-  return {
+export const NotificationScene = connect(
+  (state: RootState): StateProps => ({
     currencyInfos: getActiveWalletCurrencyInfos(state),
     userId: state.core.account.rootLoginId
-  }
-})(withTheme(NotificationComponent))
+  }),
+  null
+)(withTheme(NotificationComponent))

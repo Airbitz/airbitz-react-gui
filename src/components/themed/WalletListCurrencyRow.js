@@ -1,4 +1,5 @@
 // @flow
+
 import type { EdgeCurrencyInfo } from 'edge-core-js'
 import * as React from 'react'
 import { connect } from 'react-redux'
@@ -211,4 +212,4 @@ export const WalletListCurrencyRow = connect((state: RootState, ownProps: OwnPro
     fiatExchangeRate,
     walletFiatSymbol
   }
-})(withTheme(WalletListRowComponent))
+}, null)(withTheme(WalletListRowComponent))

@@ -1,4 +1,5 @@
 // @flow
+
 import * as React from 'react'
 import { Image, View } from 'react-native'
 import { AnimatedCircularProgress } from 'react-native-circular-progress'
@@ -110,4 +111,4 @@ export const WalletProgressIcon = connect((state: RootState, ownProps: OwnProps)
     icon,
     progress
   }
-})(withTheme(WalletProgressIconComponent))
+}, null)(withTheme(WalletProgressIconComponent))

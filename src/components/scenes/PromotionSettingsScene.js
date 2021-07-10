@@ -24,8 +24,8 @@ type StateProps = {
   deviceReferral: DeviceReferral
 }
 type DispatchProps = {
-  activatePromotion(installerId: string): Promise<void>,
-  removePromotion(installerId: string): Promise<void>
+  activatePromotion: (installerId: string) => Promise<void>,
+  removePromotion: (installerId: string) => Promise<void>
 }
 type Props = StateProps & DispatchProps & ThemeProps
 

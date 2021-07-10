@@ -246,11 +246,11 @@ const getStyles = cacheStyles((theme: Theme) => ({
   }
 }))
 
-export const DomainListModal = connect((state: RootState): StateProps => {
-  const fioWallets: EdgeCurrencyWallet[] = state.ui.wallets.fioWallets
-  return {
+export const DomainListModal = connect(
+  (state: RootState): StateProps => ({
     userDomains: state.ui.scenes.fioAddress.fioDomains,
-    fioWallets,
+    fioWallets: state.ui.wallets.fioWallets,
     fioPlugin: state.core.account.currencyConfig[CURRENCY_PLUGIN_NAMES.FIO]
-  }
-})(withTheme(DomainListModalComponent))
+  }),
+  null
+)(withTheme(DomainListModalComponent))
