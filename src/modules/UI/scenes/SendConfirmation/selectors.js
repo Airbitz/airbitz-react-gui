@@ -153,7 +153,7 @@ export const getAuthRequired = (state: RootState, spendInfo: EdgeSpendInfo): Spe
   const nativeToExchangeRatio = getExchangeDenomination(state, currencyCode).multiplier
   const exchangeAmount = convertNativeToExchange(nativeToExchangeRatio)(nativeAmount)
   const fiatAmount = convertCurrency(state, currencyCode, isoFiatCurrencyCode, parseFloat(exchangeAmount))
-  const exceedsLimit = fiatAmount >= spendingLimits.transaction.amount
+  const exceedsLimit = parseFloat(fiatAmount) >= spendingLimits.transaction.amount
 
   return exceedsLimit ? 'pin' : 'none'
 }
