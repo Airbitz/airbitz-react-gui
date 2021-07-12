@@ -6,22 +6,20 @@ import * as React from 'react'
 import { Text, TouchableOpacity, View } from 'react-native'
 import { cacheStyles } from 'react-native-patina'
 import AntDesignIcon from 'react-native-vector-icons/AntDesign'
-import { connect } from 'react-redux'
 
 import s from '../../locales/strings.js'
 import { B } from '../../styles/common/textStyles.js'
-import { type Dispatch, type RootState } from '../../types/reduxTypes.js'
+import { connect } from '../../types/reactRedux.js'
 import { SceneWrapper } from '../common/SceneWrapper.js'
 import { ButtonsModal } from '../modals/ButtonsModal.js'
 import { Airship, showActivity, showError, showToast } from '../services/AirshipInstance.js'
 import { type Theme, type ThemeProps, withTheme } from '../services/ThemeContext.js'
 import { PrimaryButton, SecondaryButton } from '../themed/ThemedButtons.js'
 
-type OwnProps = {}
 type StateProps = {
   account: EdgeAccount
 }
-type Props = OwnProps & StateProps & ThemeProps
+type Props = StateProps & ThemeProps
 
 type State = {
   otpKey?: string,
@@ -190,9 +188,9 @@ const getStyles = cacheStyles((theme: Theme) => ({
   }
 }))
 
-export const OtpSettingsScene = connect(
-  (state: RootState): StateProps => ({
+export const OtpSettingsScene = connect<StateProps, {}, {}>(
+  state => ({
     account: state.core.account
   }),
-  (dispatch: Dispatch) => ({})
+  dispatch => ({})
 )(withTheme(OtpSettingsSceneComponent))

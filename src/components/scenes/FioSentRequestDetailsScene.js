@@ -1,14 +1,13 @@
 // @flow
 
 import * as React from 'react'
-import { connect } from 'react-redux'
 
 import { FIAT_CODES_SYMBOLS } from '../../constants/WalletAndCurrencyConstants.js'
 import { formatDate, formatNumber } from '../../locales/intl.js'
 import s from '../../locales/strings.js'
 import { isRejectedFioRequest, isSentFioRequest } from '../../modules/FioRequest/util'
-import type { RootState } from '../../reducers/RootReducer'
 import { getSelectedWallet } from '../../selectors/WalletSelectors.js'
+import { connect } from '../../types/reactRedux.js'
 import { type FioRequest, type GuiExchangeRates, type GuiWallet } from '../../types/types.js'
 import { SceneWrapper } from '../common/SceneWrapper'
 import { type Theme, type ThemeProps, cacheStyles, withTheme } from '../services/ThemeContext.js'
@@ -94,11 +93,14 @@ const getStyles = cacheStyles((theme: Theme) => ({
   }
 }))
 
-export const FioSentRequestDetailsScene = connect((state: RootState): StateProps => {
-  const wallet: GuiWallet = getSelectedWallet(state)
-  return {
-    exchangeRates: state.exchangeRates,
-    fiatSymbol: FIAT_CODES_SYMBOLS[wallet.fiatCurrencyCode],
-    isoFiatCurrencyCode: wallet.isoFiatCurrencyCode
-  }
-}, null)(withTheme(FioSentRequestDetailsComponent))
+export const FioSentRequestDetailsScene = connect<StateProps, {}, NavigationProps>(
+  state => {
+    const wallet: GuiWallet = getSelectedWallet(state)
+    return {
+      exchangeRates: state.exchangeRates,
+      fiatSymbol: FIAT_CODES_SYMBOLS[wallet.fiatCurrencyCode],
+      isoFiatCurrencyCode: wallet.isoFiatCurrencyCode
+    }
+  },
+  dispatch => ({})
+)(withTheme(FioSentRequestDetailsComponent))

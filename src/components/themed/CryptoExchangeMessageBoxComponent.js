@@ -2,10 +2,9 @@
 
 import * as React from 'react'
 import { View } from 'react-native'
-import { connect } from 'react-redux'
 
 import s from '../../locales/strings'
-import type { RootState } from '../../reducers/RootReducer'
+import { connect } from '../../types/reactRedux.js'
 import { type Theme, type ThemeProps, cacheStyles, withTheme } from '../services/ThemeContext.js'
 import { EdgeText } from './EdgeText'
 
@@ -46,19 +45,22 @@ const getStyles = cacheStyles((theme: Theme) => ({
   }
 }))
 
-export const CryptoExchangeMessageBox = connect((state: RootState): StateProps => {
-  const insufficient = state.cryptoExchange.insufficientError
-  const genericError = state.cryptoExchange.genericShapeShiftError
+export const CryptoExchangeMessageBox = connect<StateProps, {}, {}>(
+  state => {
+    const insufficient = state.cryptoExchange.insufficientError
+    const genericError = state.cryptoExchange.genericShapeShiftError
 
-  let message = ''
+    let message = ''
 
-  if (genericError) {
-    message = genericError
-  } else if (insufficient) {
-    message = s.strings.fragment_insufficient_funds
-  }
+    if (genericError) {
+      message = genericError
+    } else if (insufficient) {
+      message = s.strings.fragment_insufficient_funds
+    }
 
-  return {
-    message
-  }
-}, null)(withTheme(CryptoExchangeMessageBoxComponent))
+    return {
+      message
+    }
+  },
+  dispatch => ({})
+)(withTheme(CryptoExchangeMessageBoxComponent))

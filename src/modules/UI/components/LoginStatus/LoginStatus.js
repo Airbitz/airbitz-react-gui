@@ -1,9 +1,9 @@
 // @flow
 
 import * as React from 'react'
-import { connect } from 'react-redux'
 
 import { LoadingScene } from '../../../../components/scenes/LoadingScene.js'
+import { connect } from '../../../../types/reactRedux.js'
 import { type RootState } from '../../../../types/reduxTypes.js'
 
 type StateProps = {
@@ -11,12 +11,11 @@ type StateProps = {
 }
 
 export function ifLoggedIn<Props>(Component: React.ComponentType<Props>): (props: Props) => React.Node {
-  // $FlowFixMe
-  return connect(
+  return connect<StateProps, {}, Props>(
     (state: RootState): StateProps => ({
       loginStatus: state.ui.settings.loginStatus ?? false
     }),
-    null
+    dispatch => ({})
   )((props: Props & StateProps): React.Node => {
     const { loginStatus, ...rest } = props
     return loginStatus ? <Component {...rest} /> : <LoadingScene />
