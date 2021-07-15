@@ -2,9 +2,12 @@
 
 import * as React from 'react'
 import { Alert, ScrollView, TextInput } from 'react-native'
+import { connect } from 'react-redux'
 
+import * as ADD_TOKEN_ACTIONS from '../../actions/AddTokenActions'
 import { MAX_TOKEN_CODE_CHARACTERS } from '../../constants/WalletAndCurrencyConstants'
 import s from '../../locales/strings.js'
+import { type Dispatch, type RootState } from '../../types/reduxTypes'
 import type { CustomTokenInfo, GuiWallet } from '../../types/types'
 import { useEffect, useRef, useState } from '../../util/hooks'
 import { decimalPlacesToDenomination } from '../../util/utils'
@@ -198,3 +201,15 @@ const getStyles = cacheStyles((theme: Theme) => ({
     marginBottom: 0
   }
 }))
+
+export const AddTokenScene = connect(
+  (state: RootState, ownProps: AddTokenOwnProps): AddTokenStateProps => ({
+    addTokenPending: state.ui.wallets.addTokenPending,
+    wallet: state.ui.wallets.byId[ownProps.walletId]
+  }),
+  (dispatch: Dispatch): AddTokenDispatchProps => ({
+    addNewToken: (walletId: string, currencyName: string, currencyCode: string, contractAddress: string, denomination: string, walletType: string) => {
+      dispatch(ADD_TOKEN_ACTIONS.addNewToken(walletId, currencyName, currencyCode, contractAddress, denomination, walletType))
+    }
+  })
+)(AddToken)
