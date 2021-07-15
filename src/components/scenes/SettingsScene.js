@@ -8,7 +8,6 @@ import { Actions } from 'react-native-router-flux'
 import AntDesignIcon from 'react-native-vector-icons/AntDesign'
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome'
 import IonIcon from 'react-native-vector-icons/Ionicons'
-import { connect } from 'react-redux'
 
 import {
   lockSettings,
@@ -36,7 +35,7 @@ import s from '../../locales/strings'
 import { getDefaultFiat } from '../../selectors/SettingsSelectors.js'
 import { edgeDark } from '../../theme/variables/edgeDark.js'
 import { edgeLight } from '../../theme/variables/edgeLight.js'
-import { type Dispatch, type RootState } from '../../types/reduxTypes.js'
+import { connect } from '../../types/reactRedux.js'
 import { getCurrencyIcon } from '../../util/CurrencyInfoHelpers.js'
 import { secondsToDisplay } from '../../util/displayTime.js'
 import { SceneWrapper } from '../common/SceneWrapper.js'
@@ -62,13 +61,13 @@ type StateProps = {
   touchIdEnabled: boolean
 }
 type DispatchProps = {
-  dispatchUpdateEnableTouchIdEnable(arg: boolean, account: EdgeAccount): void,
-  lockSettings(): void,
-  onTogglePinLoginEnabled(enableLogin: boolean): void,
-  setAutoLogoutTimeInSeconds(number): void,
+  dispatchUpdateEnableTouchIdEnable: (arg: boolean, account: EdgeAccount) => void,
+  lockSettings: () => void,
+  onTogglePinLoginEnabled: (enableLogin: boolean) => void,
+  setAutoLogoutTimeInSeconds: (autoLogoutTimeInSeconds: number) => void,
   showRestoreWalletsModal: () => void,
   showUnlockSettingsModal: () => void,
-  toggleDeveloperMode(developerModeOn: boolean): void
+  toggleDeveloperMode: (developerModeOn: boolean) => void
 }
 type Props = StateProps & DispatchProps & ThemeProps
 
@@ -197,7 +196,9 @@ export class SettingsSceneComponent extends React.Component<Props, State> {
     }
   }
 
-  showSendLogsModal = () => Airship.show(bridge => <SendLogsModal bridge={bridge} />)
+  showSendLogsModal = (): void => {
+    Airship.show(bridge => <SendLogsModal bridge={bridge} />)
+  }
 
   render() {
     const { account, theme, isLocked } = this.props
@@ -314,8 +315,8 @@ const getStyles = cacheStyles((theme: Theme) => {
   }
 })
 
-export const SettingsScene = connect(
-  (state: RootState): StateProps => ({
+export const SettingsScene = connect<StateProps, DispatchProps, {}>(
+  state => ({
     account: state.core.account,
     context: state.core.context,
     autoLogoutTimeInSeconds: state.ui.settings.autoLogoutTimeInSeconds,
@@ -326,7 +327,7 @@ export const SettingsScene = connect(
     supportsTouchId: state.ui.settings.isTouchSupported,
     touchIdEnabled: state.ui.settings.isTouchEnabled
   }),
-  (dispatch: Dispatch): DispatchProps => ({
+  dispatch => ({
     dispatchUpdateEnableTouchIdEnable(arg: boolean, account: EdgeAccount) {
       dispatch(updateTouchIdEnabled(arg, account))
     },

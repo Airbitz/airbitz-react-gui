@@ -6,8 +6,8 @@ import { Platform, Text, TextInput, TextInputProps, TouchableOpacity, TouchableW
 import Animated, { Extrapolate, interpolate, interpolateColor, SharedValue, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import AntDesignIcon from 'react-native-vector-icons/AntDesign'
 
+import { useCallback, useEffect, useImperativeHandle, useMemo, useState } from '../../types/reactHooks.js'
 import { unpackEdges } from '../../util/edges'
-import { useCallback, useEffect, useImperativeHandle, useMemo, useState } from '../../util/hooks'
 import { type Theme, cacheStyles, useTheme } from '../services/ThemeContext'
 
 const HINT_Y_PLATFORM_ADJUST = Platform.OS === 'android' ? -2 : 0
