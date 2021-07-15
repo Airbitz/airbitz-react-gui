@@ -47,9 +47,9 @@ export const getExchangeRate = (state: RootState, fromCurrencyCode: string, toCu
   return rate
 }
 
-export const convertCurrency = (state: RootState, fromCurrencyCode: string, toCurrencyCode: string, amount: number = 1) => {
+export const convertCurrency = (state: RootState, fromCurrencyCode: string, toCurrencyCode: string, amount: number = 1): string => {
   const exchangeRate = getExchangeRate(state, fromCurrencyCode, toCurrencyCode)
-  const convertedAmount = amount * exchangeRate
+  const convertedAmount = bns.mul(amount.toString(), exchangeRate.toString())
   return convertedAmount
 }
 
