@@ -6,12 +6,12 @@ import { Platform, ScrollView } from 'react-native'
 import RNFS from 'react-native-fs'
 import Share from 'react-native-share'
 import EntypoIcon from 'react-native-vector-icons/Entypo'
-import { connect } from 'react-redux'
 
 import { exportTransactionsToCSV, exportTransactionsToQBO } from '../../actions/TransactionExportActions.js'
 import { formatDate } from '../../locales/intl.js'
 import s from '../../locales/strings'
 import { getDisplayDenomination } from '../../selectors/DenominationSelectors.js'
+import { connect } from '../../types/reactRedux.js'
 import { type RootState } from '../../types/reduxTypes.js'
 import { SceneWrapper } from '../common/SceneWrapper.js'
 import { DateModal } from '../modals/DateModal.js'
@@ -276,9 +276,9 @@ class TransactionsExportSceneComponent extends React.PureComponent<Props, State>
   }
 }
 
-export const TransactionsExportScene = connect((state: RootState, ownProps: OwnProps): StateProps => {
-  const denominationObject = getDisplayDenomination(state, ownProps.currencyCode)
-  return {
-    multiplier: denominationObject.multiplier
-  }
-})(withTheme(TransactionsExportSceneComponent))
+export const TransactionsExportScene = connect<StateProps, {}, OwnProps>(
+  (state: RootState, ownProps: OwnProps): StateProps => ({
+    multiplier: getDisplayDenomination(state, ownProps.currencyCode).multiplier
+  }),
+  dispatch => ({})
+)(withTheme(TransactionsExportSceneComponent))
