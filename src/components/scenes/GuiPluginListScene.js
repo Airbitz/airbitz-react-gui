@@ -305,7 +305,7 @@ const getStyles = cacheStyles((theme: Theme) => ({
     marginVertical: theme.rem(1),
     marginHorizontal: theme.rem(1.5),
     fontSize: theme.rem(1.25),
-    fontFamily: theme.fontFaceBold
+    fontFamily: theme.fontFaceMedium
   },
   selectedCountryRow: {
     marginTop: theme.rem(1),
@@ -322,7 +322,7 @@ const getStyles = cacheStyles((theme: Theme) => ({
   },
   selectedCountryText: {
     flex: 1,
-    fontFamily: theme.fontFaceBold
+    fontFamily: theme.fontFaceMedium
   },
   emptyPluginContainer: {
     flex: 1,
@@ -362,7 +362,7 @@ const getStyles = cacheStyles((theme: Theme) => ({
   },
   titleText: {
     marginBottom: theme.rem(0.25),
-    fontFamily: theme.fontFaceBold
+    fontFamily: theme.fontFaceMedium
   },
   subtitleText: {
     fontSize: theme.rem(0.75),

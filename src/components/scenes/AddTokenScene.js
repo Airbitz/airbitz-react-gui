@@ -1,32 +1,29 @@
 // @flow
 
-import _ from 'lodash'
 import * as React from 'react'
-import { ActivityIndicator, Alert, ScrollView, StyleSheet, View } from 'react-native'
+import { Alert, ScrollView, TextInput } from 'react-native'
+import { connect } from 'react-redux'
 
-import { MAX_TOKEN_CODE_CHARACTERS } from '../../constants/WalletAndCurrencyConstants.js'
+import * as ADD_TOKEN_ACTIONS from '../../actions/AddTokenActions'
+import { MAX_TOKEN_CODE_CHARACTERS } from '../../constants/WalletAndCurrencyConstants'
 import s from '../../locales/strings.js'
-import { PrimaryButton } from '../../modules/UI/components/Buttons/PrimaryButton.ui.js'
-import Text from '../../modules/UI/components/FormattedText/FormattedText.ui.js'
-import { THEME } from '../../theme/variables/airbitz.js'
-import type { CustomTokenInfo, GuiWallet } from '../../types/types.js'
-import { scale } from '../../util/scaling.js'
-import { decimalPlacesToDenomination } from '../../util/utils.js'
-import { FormField } from '../common/FormField.js'
-import { SceneWrapper } from '../common/SceneWrapper.js'
+import { type Dispatch, type RootState } from '../../types/reduxTypes'
+import type { CustomTokenInfo, GuiWallet } from '../../types/types'
+import { useEffect, useRef, useState } from '../../util/hooks'
+import { decimalPlacesToDenomination } from '../../util/utils'
+import { SceneWrapper } from '../common/SceneWrapper'
+// import { MismatchTokenParamsModal } from '../modals/MismatchTokenParamsModal'
+// import { Airship } from '../services/AirshipInstance'
+import { type Theme, cacheStyles, useTheme } from '../services/ThemeContext'
+import { EdgeTextFieldOutlined } from '../themed/EdgeOutlinedField'
+import { SceneHeader } from '../themed/SceneHeader'
 
 export type AddTokenOwnProps = {
   walletId: string,
-  addTokenPending: Function,
-  addNewToken: Function,
-  currentCustomTokens: CustomTokenInfo[],
+  addTokenPending: boolean,
+  currentCustomTokens?: CustomTokenInfo[],
   wallet: GuiWallet,
-  onAddToken: Function,
-  // adding properties in case coming from Scan scene (scan QR code to add token)
-  currencyName: string,
-  currencyCode: string,
-  contractAddress: string,
-  decimalPlaces: string
+  onAddToken: (currencyCode: string) => void
 }
 
 export type AddTokenDispatchProps = {
@@ -35,191 +32,184 @@ export type AddTokenDispatchProps = {
 
 export type AddTokenStateProps = {
   addTokenPending: boolean,
-  wallet: GuiWallet
+  wallet: GuiWallet,
+  addTokenPending: boolean
 }
 
-type State = {
-  currencyName: string,
-  currencyCode: string,
-  contractAddress: string,
-  decimalPlaces: string,
-  multiplier: string,
-  enabled?: boolean
-}
+type ReturnKeyType = 'next' | 'done'
 
 type AddTokenProps = AddTokenOwnProps & AddTokenStateProps & AddTokenDispatchProps
 
-export class AddToken extends React.Component<AddTokenProps, State> {
-  constructor(props: AddTokenProps) {
-    super(props)
-    const { currencyName, currencyCode, contractAddress, decimalPlaces } = props
-    this.state = {
-      currencyName: currencyName || '',
-      currencyCode: currencyCode || '',
-      contractAddress: contractAddress || '',
-      decimalPlaces: decimalPlaces || '',
-      multiplier: ''
+export const AddToken = ({ addTokenPending, currentCustomTokens = [], wallet, walletId, addNewToken, onAddToken }: AddTokenProps) => {
+  const styles = getStyles(useTheme())
+  const [currencyCode, setCurrencyCode] = useState<string>('')
+  const [currencyName, setCurrencyName] = useState<string>('')
+  const [contractAddress, setContractAddress] = useState<string>('')
+  const [decimalPlaces, setDecimalPlaces] = useState<string>('')
+
+  const [currencyCodeReturnKeyType, setCurrencyCodeReturnKeyType] = useState<ReturnKeyType>('next')
+  const [currencyNameReturnKeyType, setCurrencyNameReturnKeyType] = useState<ReturnKeyType>('next')
+  const [contractAddressReturnKeyType, setContractAddressReturnKeyType] = useState<ReturnKeyType>('next')
+  const [decimalPlacesReturnKeyType, setDecimalPlacesReturnKeyType] = useState<ReturnKeyType>('next')
+
+  const currencyCodeInputRef = useRef<TextInput>(null)
+  const currencyNameInputRef = useRef<TextInput>(null)
+  const contractAddressInputRef = useRef<TextInput>(null)
+  const decimalPlacesInputRef = useRef<TextInput>(null)
+
+  const handleChangeContractAddress = (input: string) => {
+    setContractAddress(input.trim())
+  }
+
+  const handleSubmit = () => {
+    const currentCustomTokenIndex = currentCustomTokens.findIndex(item => item.currencyCode === currencyCode)
+    const metaTokensIndex = wallet.metaTokens.findIndex(item => item.currencyCode === currencyCode)
+
+    // if token is hard-coded into wallets of this type
+    if (metaTokensIndex >= 0) Alert.alert(s.strings.manage_tokens_duplicate_currency_code)
+
+    // if that token already exists and is visible (ie not deleted)
+    if (currentCustomTokenIndex >= 0 && currentCustomTokens[currentCustomTokenIndex].isVisible !== false) {
+      Alert.alert(s.strings.manage_tokens_duplicate_currency_code)
+    } else if (currencyName && currencyCode && decimalPlaces && contractAddress) {
+      const denomination = decimalPlacesToDenomination(decimalPlaces)
+
+      // TODO: Wait until autocomplete API will be available
+      // if (isNotExist) {
+      //   const isConfirm = await Airship.show(bridge => (
+      //     <MismatchTokenParamsModal bridge={bridge} />
+      //   ))
+
+      //   if (!isConfirm) return
+      // }
+
+      addNewToken(walletId, currencyName, currencyCode, contractAddress, denomination, wallet.type)
+      onAddToken(currencyCode)
+    } else {
+      Alert.alert(s.strings.addtoken_invalid_information)
     }
   }
 
-  render() {
-    const { addTokenPending } = this.props
-    return (
-      <SceneWrapper background="body">
-        <ScrollView style={styles.container}>
-          <View style={styles.instructionalArea}>
-            <Text style={styles.instructionalText}>{s.strings.addtoken_top_instructions}</Text>
-          </View>
-          <View style={styles.nameArea}>
-            <FormField
-              value={this.state.currencyName}
-              onChangeText={this.onChangeName}
-              autoCapitalize="words"
-              autoFocus
-              label={s.strings.addtoken_name_input_text}
-              returnKeyType="done"
-              autoCorrect={false}
-            />
-          </View>
-          <View style={styles.currencyCodeArea}>
-            <FormField
-              value={this.state.currencyCode}
-              onChangeText={this.onChangeCurrencyCode}
-              autoCapitalize="characters"
-              label={s.strings.addtoken_currency_code_input_text}
-              returnKeyType="done"
-              autoCorrect={false}
-              maxLength={MAX_TOKEN_CODE_CHARACTERS}
-            />
-          </View>
-          <View style={styles.contractAddressArea}>
-            <FormField
-              value={this.state.contractAddress}
-              onChangeText={this.onChangeContractAddress}
-              label={s.strings.addtoken_contract_address_input_text}
-              returnKeyType="done"
-              autoCorrect={false}
-            />
-          </View>
-          <View style={styles.decimalPlacesArea}>
-            <FormField
-              value={this.state.decimalPlaces}
-              onChangeText={this.onChangeDecimalPlaces}
-              label={s.strings.addtoken_denomination_input_text}
-              returnKeyType="done"
-              autoCorrect={false}
-              keyboardType="numeric"
-            />
-          </View>
-          <View style={styles.buttonsArea}>
-            <PrimaryButton style={styles.saveButton} onPress={this._onSave}>
-              {addTokenPending ? <ActivityIndicator color={THEME.COLORS.ACCENT_MINT} /> : <PrimaryButton.Text>{s.strings.string_save}</PrimaryButton.Text>}
-            </PrimaryButton>
-          </View>
-          <View style={styles.bottomPaddingForKeyboard} />
-        </ScrollView>
-      </SceneWrapper>
-    )
+  const handleSubmitEditing = async () => {
+    const data = [currencyCode, currencyName, contractAddress, decimalPlaces]
+    const inputRefs = [currencyCodeInputRef, currencyNameInputRef, contractAddressInputRef, decimalPlacesInputRef]
+    const dataEmptyIndex = data.findIndex(item => item === '')
+
+    if (dataEmptyIndex === -1) {
+      handleSubmit()
+    } else {
+      inputRefs[dataEmptyIndex].current.focus()
+    }
   }
 
-  onChangeName = (input: string) => {
-    this.setState({
-      currencyName: input
-    })
-  }
+  useEffect(() => {
+    const data = [currencyCode, currencyName, contractAddress, decimalPlaces]
+    const returnKeyTypeSetters = [setCurrencyCodeReturnKeyType, setCurrencyNameReturnKeyType, setContractAddressReturnKeyType, setDecimalPlacesReturnKeyType]
+    let dataEmptyIndex = -1
+    let dataEmptyCount = 0
 
-  onChangeCurrencyCode = (input: string) => {
-    this.setState({
-      currencyCode: input
-    })
-  }
+    for (let index = 0; index < data.length; index++) {
+      if (data[index] === '') {
+        dataEmptyCount += 1
 
-  onChangeDecimalPlaces = (input: string) => {
-    this.setState({
-      decimalPlaces: input
-    })
-  }
-
-  onChangeContractAddress = (input: string) => {
-    this.setState({
-      contractAddress: input.trim()
-    })
-  }
-
-  _onSave = () => {
-    const currencyCode = this.state.currencyCode.toUpperCase()
-    this.setState(
-      {
-        currencyCode
-      },
-      () => {
-        const { currencyName, decimalPlaces, contractAddress } = this.state
-        const { currentCustomTokens, wallet, walletId, addNewToken, onAddToken } = this.props
-        const currentCustomTokenIndex = _.findIndex(currentCustomTokens, item => item.currencyCode === currencyCode)
-        const metaTokensIndex = _.findIndex(wallet.metaTokens, item => item.currencyCode === currencyCode)
-        // if token is hard-coded into wallets of this type
-        if (metaTokensIndex >= 0) Alert.alert(s.strings.manage_tokens_duplicate_currency_code)
-        // if that token already exists and is visible (ie not deleted)
-        if (currentCustomTokenIndex >= 0 && currentCustomTokens[currentCustomTokenIndex].isVisible !== false) {
-          Alert.alert(s.strings.manage_tokens_duplicate_currency_code)
-        } else {
-          if (currencyName && currencyCode && decimalPlaces && contractAddress) {
-            const denomination = decimalPlacesToDenomination(decimalPlaces)
-            addNewToken(walletId, currencyName, currencyCode, contractAddress, denomination, wallet.type)
-            onAddToken(currencyCode)
-          } else {
-            Alert.alert(s.strings.addtoken_invalid_information)
-          }
-        }
+        if (dataEmptyCount === 1) dataEmptyIndex = index
       }
-    )
-  }
+    }
+
+    for (let index = 0; index < data.length; index++) {
+      returnKeyTypeSetters[index](dataEmptyCount === 0 || (index === dataEmptyIndex && dataEmptyCount === 1) ? 'done' : 'next')
+    }
+  }, [
+    currencyCode,
+    currencyName,
+    contractAddress,
+    decimalPlaces,
+    setCurrencyCodeReturnKeyType,
+    setCurrencyNameReturnKeyType,
+    setContractAddressReturnKeyType,
+    setDecimalPlacesReturnKeyType
+  ])
+
+  return (
+    <SceneWrapper avoidKeyboard background="theme">
+      <SceneHeader title={s.strings.title_add_token} style={styles.header} bold />
+      <ScrollView style={styles.container}>
+        <EdgeTextFieldOutlined
+          ref={currencyCodeInputRef}
+          autoFocus
+          showSearchIcon={false}
+          onChangeText={setCurrencyCode}
+          value={currencyCode}
+          autoCapitalize="characters"
+          autoCorrect={false}
+          returnKeyType={currencyCodeReturnKeyType}
+          label={s.strings.addtoken_currency_code_input_text}
+          marginRem={[0.5, 0.6, 1]}
+          hideSearchIcon
+          maxLength={MAX_TOKEN_CODE_CHARACTERS}
+          onSubmitEditing={handleSubmitEditing}
+        />
+        <EdgeTextFieldOutlined
+          ref={currencyNameInputRef}
+          showSearchIcon={false}
+          onChangeText={setCurrencyName}
+          value={currencyName}
+          autoCapitalize="words"
+          autoCorrect={false}
+          returnKeyType={currencyNameReturnKeyType}
+          label={s.strings.addtoken_name_input_text}
+          marginRem={[0.5, 0.6, 1]}
+          hideSearchIcon
+          onSubmitEditing={handleSubmitEditing}
+        />
+        <EdgeTextFieldOutlined
+          ref={contractAddressInputRef}
+          showSearchIcon={false}
+          onChangeText={handleChangeContractAddress}
+          value={contractAddress}
+          autoCorrect={false}
+          returnKeyType={contractAddressReturnKeyType}
+          label={s.strings.addtoken_contract_address_input_text}
+          marginRem={[0.5, 0.6, 1]}
+          hideSearchIcon
+          onSubmitEditing={handleSubmitEditing}
+        />
+        <EdgeTextFieldOutlined
+          ref={decimalPlacesInputRef}
+          showSearchIcon={false}
+          onChangeText={setDecimalPlaces}
+          value={decimalPlaces}
+          autoCorrect={false}
+          returnKeyType={decimalPlacesReturnKeyType}
+          label={s.strings.addtoken_denomination_input_text}
+          marginRem={[0.5, 0.6, 0]}
+          hideSearchIcon
+          keyboardType="numeric"
+          onSubmitEditing={handleSubmitEditing}
+        />
+      </ScrollView>
+    </SceneWrapper>
+  )
 }
 
-const rawStyles = {
+const getStyles = cacheStyles((theme: Theme) => ({
   container: {
     flex: 1,
-    paddingHorizontal: scale(20)
+    paddingHorizontal: theme.rem(1)
   },
-
-  instructionalArea: {
-    paddingVertical: scale(16),
-    paddingHorizontal: scale(20)
-  },
-  instructionalText: {
-    fontSize: scale(16),
-    textAlign: 'center'
-  },
-
-  nameArea: {
-    height: scale(70)
-  },
-  currencyCodeArea: {
-    height: scale(70)
-  },
-  contractAddressArea: {
-    height: scale(70)
-  },
-  decimalPlacesArea: {
-    height: scale(70)
-  },
-  buttonsArea: {
-    marginTop: scale(16),
-    height: scale(52),
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    alignSelf: 'flex-end',
-    paddingVertical: scale(4)
-  },
-  saveButton: {
-    flex: 1,
-    marginLeft: scale(2),
-    backgroundColor: THEME.COLORS.SECONDARY,
-    borderRadius: 3
-  },
-  bottomPaddingForKeyboard: {
-    height: scale(300)
+  header: {
+    marginBottom: 0
   }
-}
-const styles: typeof rawStyles = StyleSheet.create(rawStyles)
+}))
+
+export const AddTokenScene = connect(
+  (state: RootState, ownProps: AddTokenOwnProps): AddTokenStateProps => ({
+    addTokenPending: state.ui.wallets.addTokenPending,
+    wallet: state.ui.wallets.byId[ownProps.walletId]
+  }),
+  (dispatch: Dispatch): AddTokenDispatchProps => ({
+    addNewToken: (walletId: string, currencyName: string, currencyCode: string, contractAddress: string, denomination: string, walletType: string) => {
+      dispatch(ADD_TOKEN_ACTIONS.addNewToken(walletId, currencyName, currencyCode, contractAddress, denomination, walletType))
+    }
+  })
+)(AddToken)
